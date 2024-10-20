@@ -1,0 +1,27 @@
+.task-form {
+  padding: 0 20px;
+  border-radius: 8px;
+  max-width: 600px;
+  margin: auto;
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+#task-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  transition: border-color 0.3s;
+}
+
+@media (max-width: 768px) {
+  .task-form {
+    padding: 15px;
+    max-height: 90vh;
+  }
+}

@@ -1,0 +1,79 @@
+.task-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #142330;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: background-color 0.3s;
+}
+
+.completed {
+  background-color: #dadada88;
+  text-decoration: line-through;
+}
+
+.task-name {
+  color: white;
+
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.task-description {
+  color: rgb(226, 225, 225);
+}
+
+.task-due-date {
+  color: #a1a1a1;
+}
+
+.priority-high {
+  font-weight: bold;
+  color: red;
+  text-transform: uppercase;
+}
+
+.priority-medium {
+  font-weight: bold;
+  text-transform: uppercase;
+  color: orange;
+}
+
+.priority-low {
+  text-transform: uppercase;
+  font-weight: bold;
+  color: green;
+}
+.complete {
+  padding: 3px 2px;
+  background-color: #4caf50;
+  color: #252525;
+  font-weight: bolder;
+  border: none;
+
+  cursor: pointer;
+  margin-right: 5px;
+  font-weight: 600;
+}
+.delete {
+  padding: 3px 2px;
+  background-color: #f44336;
+  color: #dadada;
+  font-weight: bolder;
+  border: none;
+  cursor: pointer;
+  margin-right: 5px;
+  font-weight: 600;
+}
+.edit {
+  padding: 3px 3px;
+  background-color: #2196f3;
+  color: #fff9f9;
+  font-weight: bolder;
+  border: none;
+  cursor: pointer;
+  margin-right: 5px;
+  font-weight: 600;
+}
