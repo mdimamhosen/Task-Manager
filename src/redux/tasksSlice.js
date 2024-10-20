@@ -2,15 +2,13 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
+// Fetch tasks from the API
 export const fetchTasks = createAsyncThunk(
   "tasks/fetchTasks",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get("/api/tasks");
-      console.log(
-        "response from fetch tasks response.data.data",
-        response.data.data
-      );
+      console.log("response from fetch tasks:", response.data.data);
       return response.data.data;
     } catch (error) {
       toast.error("Failed to fetch tasks.");
@@ -19,14 +17,13 @@ export const fetchTasks = createAsyncThunk(
   }
 );
 
+// Create a new task
 export const createTask = createAsyncThunk(
   "tasks/createTask",
   async (task, { rejectWithValue }) => {
     try {
       const response = await axios.post("/api/tasks", task);
       toast.success("Task created successfully!");
-      console.log("response from create task", response.data);
-
       return response.data;
     } catch (error) {
       toast.error("Failed to create task.");
@@ -35,6 +32,25 @@ export const createTask = createAsyncThunk(
   }
 );
 
+// Update an existing task
+export const updateTask = createAsyncThunk(
+  "tasks/updateTask",
+  async ({ id, updates }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`/api/update-tasks`, {
+        id,
+        updates,
+      });
+      toast.success("Task updated successfully!");
+      return response.data;
+    } catch (error) {
+      toast.error("Failed to update task.");
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// Slice definition
 const tasksSlice = createSlice({
   name: "tasks",
   initialState: {
@@ -43,13 +59,6 @@ const tasksSlice = createSlice({
     error: null,
   },
   reducers: {
-    updateTask: (state, action) => {
-      const { id, updates } = action.payload;
-      const task = state.tasks.find((task) => task._id === id);
-      if (task) {
-        Object.assign(task, updates);
-      }
-    },
     deleteTask: (state, action) => {
       state.tasks = state.tasks.filter((task) => task._id !== action.payload);
       toast.success("Task deleted successfully!");
@@ -81,10 +90,18 @@ const tasksSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       });
+
+    builder.addCase(updateTask.fulfilled, (state, action) => {
+      const index = state.tasks.findIndex(
+        (task) => task._id === action.payload._id
+      );
+      if (index !== -1) {
+        state.tasks[index] = action.payload;
+      }
+    });
   },
 });
 
-// Actions and reducer export
-export const { updateTask, deleteTask } = tasksSlice.actions;
+export const { deleteTask } = tasksSlice.actions;
 
 export default tasksSlice.reducer;

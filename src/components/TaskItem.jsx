@@ -1,7 +1,6 @@
-"use client";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { deleteTask, updateTask } from "../redux/tasksSlice";
+import { deleteTask, updateTask, fetchTasks } from "../redux/tasksSlice";
 import "./TaskItem.css";
 
 const TaskItem = ({ task }) => {
@@ -14,7 +13,9 @@ const TaskItem = ({ task }) => {
   const handleToggleComplete = () => {
     dispatch(
       updateTask({ id: task._id, updates: { completed: !task.completed } })
-    );
+    ).then(() => {
+      dispatch(fetchTasks());
+    });
   };
 
   const getPriorityClass = (priority) => {
@@ -44,13 +45,25 @@ const TaskItem = ({ task }) => {
         </span>
       </p>
       <div>
-        <button className="complete" onClick={handleToggleComplete}>
-          Complete
+        <button
+          className={task.completed ? "not-allowed complete" : "complete"}
+          disabled={task.completed}
+          onClick={handleToggleComplete}
+        >
+          {task.completed ? "Completed" : "Complete"}
         </button>
-        <button className="delete" onClick={handleDelete}>
+        <button
+          className={task.completed ? "not-allowed delete" : "delete"}
+          disabled={task.completed}
+          onClick={handleDelete}
+        >
           Delete
         </button>
-        <button className="edit" onClick={() => console.log("Edit task")}>
+        <button
+          className={task.completed ? "not-allowed edit" : "edit"}
+          disabled={task.completed}
+          onClick={() => console.log("Edit task")}
+        >
           Edit
         </button>
       </div>
