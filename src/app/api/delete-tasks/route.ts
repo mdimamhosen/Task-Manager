@@ -5,40 +5,36 @@ import { NextResponse } from "next/server";
 export async function POST(req) {
   await DBConnect();
   try {
-    const { id, updates } = await req.json();
-    console.log({
-      id: id,
-      updates: updates,
-    });
-    if (!id || !updates) {
+    const { id } = await req.json();
+    console.log(id);
+    const deletedTask = await Task.findByIdAndDelete(id);
+    if (!deletedTask) {
       return NextResponse.json(
         {
           success: false,
-          message: "Missing required fields.",
+          message: "Task not found.",
         },
         {
-          status: 400,
+          status: 404,
         }
       );
     }
-
-    const updateTask = await Task.findByIdAndUpdate(id, updates, { new: true });
     return NextResponse.json(
       {
         success: true,
-        data: updateTask,
-        message: "Task updated successfully!",
+        data: deletedTask,
+        message: "Task deleted successfully!",
       },
       {
         status: 200,
       }
     );
   } catch (error) {
-    console.error(error);
+    console.log(error);
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to update task.",
+        message: "Failed to delete task.",
       },
       {
         status: 500,

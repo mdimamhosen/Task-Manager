@@ -8,7 +8,6 @@ export const fetchTasks = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get("/api/tasks");
-      console.log("response from fetch tasks:", response.data.data);
       return response.data.data;
     } catch (error) {
       toast.error("Failed to fetch tasks.");
@@ -42,9 +41,46 @@ export const updateTask = createAsyncThunk(
         updates,
       });
       toast.success("Task updated successfully!");
-      return response.data;
+      return response.data; // Return the updated task data
     } catch (error) {
       toast.error("Failed to update task.");
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// Mark task as completed
+export const completeTask = createAsyncThunk(
+  "tasks/completeTask",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`/api/complete-task`, { id });
+      toast.success("Task marked as completed!");
+      return response.data;
+    } catch (error) {
+      toast.error("Failed to complete task.");
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// Delete a task with Undo option
+export const deleteTask = createAsyncThunk(
+  "tasks/deleteTask",
+  async (id, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await axios.post(`/api/delete-tasks`, { id });
+      toast.success("Task deleted successfully!");
+
+      // Temporarily remove the task from the list for 5 seconds
+      dispatch(addDeletedTask(id));
+      setTimeout(() => {
+        dispatch(removeDeletedTask(id)); // Permanently delete if not undone
+      }, 5000);
+
+      return id;
+    } catch (error) {
+      toast.error("Failed to delete task.");
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -55,13 +91,42 @@ const tasksSlice = createSlice({
   name: "tasks",
   initialState: {
     tasks: [],
+    deletedTasks: [],
     status: "idle",
     error: null,
   },
   reducers: {
-    deleteTask: (state, action) => {
-      state.tasks = state.tasks.filter((task) => task._id !== action.payload);
-      toast.success("Task deleted successfully!");
+    restoreDeletedTask: (state, action) => {
+      const deletedTaskId = action.payload;
+      const taskToRestore = state.deletedTasks.find(
+        (task) => task._id === deletedTaskId
+      );
+      if (taskToRestore) {
+        state.tasks.push(taskToRestore);
+        state.deletedTasks = state.deletedTasks.filter(
+          (task) => task._id !== deletedTaskId
+        );
+        toast.success("Task restored!");
+      } else {
+        toast.error("Task not found for restoration.");
+      }
+    },
+    addDeletedTask: (state, action) => {
+      const deletedTaskId = action.payload;
+      const taskToDelete = state.tasks.find(
+        (task) => task._id === deletedTaskId
+      );
+      if (taskToDelete) {
+        state.deletedTasks.push(taskToDelete);
+      }
+      state.tasks = state.tasks.filter((task) => task._id !== deletedTaskId);
+    },
+    removeDeletedTask: (state, action) => {
+      const deletedTaskId = action.payload;
+      state.deletedTasks = state.deletedTasks.filter(
+        (task) => task._id !== deletedTaskId
+      );
+      toast.success("Task permanently deleted.");
     },
   },
   extraReducers: (builder) => {
@@ -76,9 +141,7 @@ const tasksSlice = createSlice({
       .addCase(fetchTasks.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
-      });
-
-    builder
+      })
       .addCase(createTask.pending, (state) => {
         state.status = "loading";
       })
@@ -89,19 +152,30 @@ const tasksSlice = createSlice({
       .addCase(createTask.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
-      });
+      })
+      .addCase(updateTask.fulfilled, (state, action) => {
+        const index = state.tasks.findIndex(
+          (task) => task._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.tasks[index] = action.payload;
+        }
+      })
+      .addCase(completeTask.fulfilled, (state, action) => {
+        const index = state.tasks.findIndex(
+          (task) => task._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.tasks[index].completed = true;
+        }
+      })
+      .addCase(deleteTask.fulfilled, (state, action) => {
 
-    builder.addCase(updateTask.fulfilled, (state, action) => {
-      const index = state.tasks.findIndex(
-        (task) => task._id === action.payload._id
-      );
-      if (index !== -1) {
-        state.tasks[index] = action.payload;
-      }
-    });
+      });
   },
 });
 
-export const { deleteTask } = tasksSlice.actions;
+export const { restoreDeletedTask, addDeletedTask, removeDeletedTask } =
+  tasksSlice.actions;
 
 export default tasksSlice.reducer;

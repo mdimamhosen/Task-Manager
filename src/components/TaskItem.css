@@ -79,3 +79,21 @@
 .not-allowed {
   cursor: not-allowed;
 }
+.task-tag {
+  padding: 1px 1px;
+  border-radius: 2px;
+  font-size: 14px;
+  /* background-color: #ffffff; */
+  color: #fffb00;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  margin-right: 5px;
+  font-weight: 700;
+}
+.task-tags-container {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  align-items: center;
+}

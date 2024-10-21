@@ -15,15 +15,24 @@ const TaskList = () => {
     dispatch(fetchTasks());
   }, [dispatch]);
 
+  // Separate tasks into completed and pending
+  const pendingTasks = tasks.filter((task) => !task.completed);
+  const completedTasks = tasks.filter((task) => task.completed);
+
   return (
     <div className="TaskList">
       <h2 className="subsection_heading your-task-heading">Your Tasks</h2>
 
-      <section className=" ">
-        {status === "loading" && <p>Loading tasks...</p>}
+      <section>
+        {status === "loading" && <p className="loading">Loading tasks...</p>}
         {status === "failed" && <p>{error}</p>}
         <div className="task-list-container">
-          {tasks.map((task) => (
+          {/* Render pending tasks */}
+          {pendingTasks.map((task) => (
+            <TaskItem key={task._id} task={task} />
+          ))}
+          {/* Render completed tasks */}
+          {completedTasks.map((task) => (
             <TaskItem key={task._id} task={task} />
           ))}
         </div>
