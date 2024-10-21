@@ -198,3 +198,17 @@ body {
     width: 50%;
   }
 }
+
+.undo-notification {
+  color: red;
+  font-weight: bold;
+}
+
+.undo-notification button {
+  margin-left: 10px;
+  background-color: blue;
+  color: white;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+}

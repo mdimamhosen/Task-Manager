@@ -17,7 +17,7 @@ const ConfirmationModal = ({ modalData }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    modalData?.btn1Handler(); // This will call the edit handler
+    modalData?.btn1Handler();
   };
 
   return (

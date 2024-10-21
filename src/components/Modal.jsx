@@ -6,13 +6,15 @@ const Modal = ({ isOpen, onClose, onSave, taskDetails }) => {
   const [task, setTask] = useState({});
 
   useEffect(() => {
-    setTask({
-      name: taskDetails.name,
-      description: taskDetails.description,
-      dueDate: taskDetails.dueDate.split("T")[0],
-      priority: taskDetails.priority,
-      tags: taskDetails.tags,
-    });
+    if (taskDetails) {
+      setTask({
+        name: taskDetails.name,
+        description: taskDetails.description,
+        dueDate: taskDetails.dueDate ? taskDetails.dueDate.split("T")[0] : "",
+        priority: taskDetails.priority,
+        tags: taskDetails.tags || [],
+      });
+    }
   }, [taskDetails]);
 
   const handleChange = (e) => {

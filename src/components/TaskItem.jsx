@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { deleteTask, updateTask, fetchTasks } from "../redux/tasksSlice";
-import Modal from "./Modal"; // Import the modal component
+import { updateTask, fetchTasks, deleteTask } from "../redux/tasksSlice";
+import Modal from "./Modal";
 import "./TaskItem.css";
 
 const TaskItem = ({ task }) => {
   const dispatch = useDispatch();
   const [confirmationModal, setConfirmationModal] = useState(false);
   const [taskDetails, setTaskDetails] = useState(task);
+  const [isDeleted, setIsDeleted] = useState(false);
+  const [undoTimeout, setUndoTimeout] = useState(null);
 
-  // Get priority class based on task priority
   const getPriorityClass = (priority) => {
     switch (priority) {
       case "high":
@@ -23,12 +24,23 @@ const TaskItem = ({ task }) => {
     }
   };
 
-  // Handle task deletion
-  const handleDelete = () => {
-    dispatch(deleteTask(task._id));
+  const handleDelete = async () => {
+    setIsDeleted(true);
+
+    const timeout = setTimeout(async () => {
+      await dispatch(deleteTask({ id: task._id }));
+      await dispatch(fetchTasks());
+      setIsDeleted(false);
+    }, 5000);
+
+    setUndoTimeout(timeout);
   };
 
-  // Handle toggling task completion status
+  const handleUndoDelete = () => {
+    clearTimeout(undoTimeout);
+    setIsDeleted(false);
+  };
+
   const handleToggleComplete = () => {
     dispatch(
       updateTask({ id: task._id, updates: { completed: !task.completed } })
@@ -45,7 +57,6 @@ const TaskItem = ({ task }) => {
       priority: editedTask.priority,
       tags: editedTask.tags,
     };
-    console.log("Task to be updated:", JSON.stringify(update));
     try {
       await dispatch(updateTask({ id: task._id, updates: update }));
       setConfirmationModal(false);
@@ -60,58 +71,81 @@ const TaskItem = ({ task }) => {
     setConfirmationModal(true);
   };
 
+  useEffect(() => {
+    return () => {
+      if (undoTimeout) {
+        clearTimeout(undoTimeout);
+      }
+    };
+  }, [undoTimeout]);
+
   return (
     <>
-      <div className={`task-item ${task.completed ? "completed" : ""}`}>
-        <h2 className="task-name">{task.name}</h2>
-        <p className="task-description">{task.description}</p>
-        <p className="task-due-date">
-          Due: {new Date(task.dueDate).toLocaleDateString()}
-        </p>
-        <p>
-          Priority:{" "}
-          <span className={`task-priority ${getPriorityClass(task.priority)}`}>
-            {task.priority}
-          </span>
-        </p>
-        <div className="task-tags-container">
-          <p>Tags:</p>
-          {task.tags.map((label) => (
-            <span key={label} className="task-tag">
-              #{label}
+      {!isDeleted ? (
+        <div className={`task-item ${task.completed ? "completed" : ""}`}>
+          <h2 className="task-name">{task.name}</h2>
+          <p className="task-description">{task.description}</p>
+          <p className="task-due-date">
+            Due: {new Date(task.dueDate).toLocaleDateString()}
+          </p>
+          <p>
+            Priority:{" "}
+            <span
+              className={`task-priority ${getPriorityClass(task.priority)}`}
+            >
+              {task.priority}
             </span>
-          ))}
+          </p>
+          <div className="task-tags-container">
+            <p>Tags:</p>
+            {task.tags && task.tags.length > 0 ? (
+              task.tags.map((label) => (
+                <span key={label} className="task-tag">
+                  #{label}
+                </span>
+              ))
+            ) : (
+              <span>No tags available</span>
+            )}
+          </div>
+
+          <div>
+            <button
+              className={task.completed ? "not-allowed complete" : "complete"}
+              disabled={task.completed}
+              onClick={handleToggleComplete}
+            >
+              {task.completed ? "Completed" : "Complete"}
+            </button>
+            <button
+              className={task.completed ? "not-allowed delete" : "delete"}
+              disabled={task.completed}
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+            <button
+              className={task.completed ? "not-allowed edit" : "edit"}
+              disabled={task.completed}
+              onClick={openEditModal}
+            >
+              Edit
+            </button>
+          </div>
         </div>
-        <div>
-          <button
-            className={task.completed ? "not-allowed complete" : "complete"}
-            disabled={task.completed}
-            onClick={handleToggleComplete}
-          >
-            {task.completed ? "Completed" : "Complete"}
-          </button>
-          <button
-            className={task.completed ? "not-allowed delete" : "delete"}
-            disabled={task.completed}
-            onClick={handleDelete}
-          >
-            Delete
-          </button>
-          <button
-            className={task.completed ? "not-allowed edit" : "edit"}
-            disabled={task.completed}
-            onClick={openEditModal}
-          >
-            Edit
-          </button>
+      ) : (
+        <div className="undo-notification">
+          <p>
+            Task deleted. <button onClick={handleUndoDelete}>Undo</button>
+          </p>
         </div>
-      </div>
+      )}
 
       <Modal
         isOpen={confirmationModal}
         onClose={() => {
           setConfirmationModal(false);
-          setTaskDetails(task); // Reset to original task when closed
+          setTaskDetails(task);
         }}
         onSave={handleEdit}
         taskDetails={taskDetails}

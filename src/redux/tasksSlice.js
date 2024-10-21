@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
-// Fetch tasks from the API
 export const fetchTasks = createAsyncThunk(
   "tasks/fetchTasks",
   async (_, { rejectWithValue }) => {
@@ -16,7 +15,6 @@ export const fetchTasks = createAsyncThunk(
   }
 );
 
-// Create a new task
 export const createTask = createAsyncThunk(
   "tasks/createTask",
   async (task, { rejectWithValue }) => {
@@ -31,7 +29,6 @@ export const createTask = createAsyncThunk(
   }
 );
 
-// Update an existing task
 export const updateTask = createAsyncThunk(
   "tasks/updateTask",
   async ({ id, updates }, { rejectWithValue }) => {
@@ -41,7 +38,7 @@ export const updateTask = createAsyncThunk(
         updates,
       });
       toast.success("Task updated successfully!");
-      return response.data; // Return the updated task data
+      return response.data;
     } catch (error) {
       toast.error("Failed to update task.");
       return rejectWithValue(error.response?.data || error.message);
@@ -49,35 +46,12 @@ export const updateTask = createAsyncThunk(
   }
 );
 
-// Mark task as completed
-export const completeTask = createAsyncThunk(
-  "tasks/completeTask",
-  async (id, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(`/api/complete-task`, { id });
-      toast.success("Task marked as completed!");
-      return response.data;
-    } catch (error) {
-      toast.error("Failed to complete task.");
-      return rejectWithValue(error.response?.data || error.message);
-    }
-  }
-);
-
-// Delete a task with Undo option
 export const deleteTask = createAsyncThunk(
   "tasks/deleteTask",
-  async (id, { dispatch, rejectWithValue }) => {
+  async ({ id }, { rejectWithValue }) => {
     try {
       const response = await axios.post(`/api/delete-tasks`, { id });
       toast.success("Task deleted successfully!");
-
-      // Temporarily remove the task from the list for 5 seconds
-      dispatch(addDeletedTask(id));
-      setTimeout(() => {
-        dispatch(removeDeletedTask(id)); // Permanently delete if not undone
-      }, 5000);
-
       return id;
     } catch (error) {
       toast.error("Failed to delete task.");
@@ -86,7 +60,6 @@ export const deleteTask = createAsyncThunk(
   }
 );
 
-// Slice definition
 const tasksSlice = createSlice({
   name: "tasks",
   initialState: {
@@ -95,40 +68,7 @@ const tasksSlice = createSlice({
     status: "idle",
     error: null,
   },
-  reducers: {
-    restoreDeletedTask: (state, action) => {
-      const deletedTaskId = action.payload;
-      const taskToRestore = state.deletedTasks.find(
-        (task) => task._id === deletedTaskId
-      );
-      if (taskToRestore) {
-        state.tasks.push(taskToRestore);
-        state.deletedTasks = state.deletedTasks.filter(
-          (task) => task._id !== deletedTaskId
-        );
-        toast.success("Task restored!");
-      } else {
-        toast.error("Task not found for restoration.");
-      }
-    },
-    addDeletedTask: (state, action) => {
-      const deletedTaskId = action.payload;
-      const taskToDelete = state.tasks.find(
-        (task) => task._id === deletedTaskId
-      );
-      if (taskToDelete) {
-        state.deletedTasks.push(taskToDelete);
-      }
-      state.tasks = state.tasks.filter((task) => task._id !== deletedTaskId);
-    },
-    removeDeletedTask: (state, action) => {
-      const deletedTaskId = action.payload;
-      state.deletedTasks = state.deletedTasks.filter(
-        (task) => task._id !== deletedTaskId
-      );
-      toast.success("Task permanently deleted.");
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchTasks.pending, (state) => {
@@ -142,16 +82,8 @@ const tasksSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
-      .addCase(createTask.pending, (state) => {
-        state.status = "loading";
-      })
       .addCase(createTask.fulfilled, (state, action) => {
-        state.status = "succeeded";
         state.tasks.push(action.payload);
-      })
-      .addCase(createTask.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
       })
       .addCase(updateTask.fulfilled, (state, action) => {
         const index = state.tasks.findIndex(
@@ -161,21 +93,16 @@ const tasksSlice = createSlice({
           state.tasks[index] = action.payload;
         }
       })
-      .addCase(completeTask.fulfilled, (state, action) => {
-        const index = state.tasks.findIndex(
-          (task) => task._id === action.payload._id
-        );
-        if (index !== -1) {
-          state.tasks[index].completed = true;
-        }
-      })
       .addCase(deleteTask.fulfilled, (state, action) => {
-
+        const id = action.payload;
+        const taskToDelete = state.tasks.find((task) => task._id === id);
+        if (taskToDelete) {
+          state.deletedTasks.push(taskToDelete); // Add to deletedTasks for undo
+          state.tasks = state.tasks.filter((task) => task._id !== id);
+        }
       });
   },
 });
 
-export const { restoreDeletedTask, addDeletedTask, removeDeletedTask } =
-  tasksSlice.actions;
-
+export const { restoreDeletedTask } = tasksSlice.actions;
 export default tasksSlice.reducer;
