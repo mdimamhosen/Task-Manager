@@ -27,10 +27,10 @@ const TaskList = () => {
         {status === "failed" && <p>{error}</p>}
         <div className="task-list-container">
           {pendingTasks.map((task) => (
-            <TaskItem key={task._id} task={task} />
+            <TaskItem key={`pending-${task._id}`} task={task} />
           ))}
           {completedTasks.map((task) => (
-            <TaskItem key={task._id} task={task} />
+            <TaskItem key={`completed-${task._id}`} task={task} />
           ))}
         </div>
       </section>

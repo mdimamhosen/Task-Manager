@@ -1,20 +1,22 @@
-import DBConnect from "@/lib/DBConnect";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
-import Task from "@/models/Taks";
+import DBConnect from "../../../../lib/DBConnect";
+import Task from "../../../../models/Taks";
 
 export async function PUT(req, { params }) {
   await DBConnect();
   try {
-    const { id } = params;
+    const { id } = await params;
     const updates = await req.json();
 
     console.log({
       id: id,
       updates: updates,
     });
+    if (updates.reminder) {
+      console.log("Reminder is active");
+    }
 
-    // Validate the required fields
     if (!id || !updates) {
       return NextResponse.json(
         {
@@ -27,7 +29,6 @@ export async function PUT(req, { params }) {
       );
     }
 
-    // Ensure the ID is a valid ObjectId
     if (!ObjectId.isValid(id)) {
       return NextResponse.json(
         {
@@ -40,13 +41,12 @@ export async function PUT(req, { params }) {
       );
     }
 
-    // Update the task in the database
     const updatedTask = await Task.findByIdAndUpdate(id, updates, {
-      new: true, // Return the updated document
-      runValidators: true, // Run schema validators
+      new: true,
+      runValidators: true,
     });
+    console.log(updatedTask);
 
-    // Check if the task was found and updated
     if (!updatedTask) {
       return NextResponse.json(
         {

@@ -11,9 +11,7 @@ const TaskItem = ({ task }) => {
   const [taskDetails, setTaskDetails] = useState(task);
   const [isDeleted, setIsDeleted] = useState(false);
   const [undoTimeout, setUndoTimeout] = useState(null);
-  const [reminderActive, setReminderActive] = useState(
-    task.reminderActive || false
-  );
+  const [reminderActive, setReminderActive] = useState(task.reminder || false);
 
   const getPriorityClass = (priority) => {
     switch (priority) {
@@ -35,34 +33,35 @@ const TaskItem = ({ task }) => {
       await dispatch(fetchTasks());
       setIsDeleted(false);
     }, 5000);
-
     setUndoTimeout(timeout);
   };
 
   const handleUndoDelete = () => {
-    clearTimeout(undoTimeout);
-    setIsDeleted(false);
+    if (undoTimeout) {
+      clearTimeout(undoTimeout);
+      setIsDeleted(false);
+    }
   };
 
   const handleToggleComplete = () => {
     dispatch(
       updateTask({ id: task._id, updates: { completed: !task.completed } })
-    ).then(() => {
-      dispatch(fetchTasks());
-    });
+    )
+      .then(() => dispatch(fetchTasks()))
+      .catch((error) => console.error("Error completing task:", error));
   };
 
   const handleEdit = async (editedTask) => {
-    const update = {
+    const updates = {
       name: editedTask.name,
       description: editedTask.description,
       dueDate: editedTask.dueDate,
       priority: editedTask.priority,
       tags: editedTask.tags,
-      reminderActive: reminderActive, // Include reminder state in updates
+      reminder: reminderActive,
     };
     try {
-      await dispatch(updateTask({ id: task._id, updates: update }));
+      await dispatch(updateTask({ id: task._id, updates }));
       setConfirmationModal(false);
       await dispatch(fetchTasks());
     } catch (error) {
@@ -74,16 +73,28 @@ const TaskItem = ({ task }) => {
     setTaskDetails(task);
     setConfirmationModal(true);
   };
+  const handleToggleReminder = async () => {
+    const newReminderStatus = !reminderActive; // Get the new status before updating the state
+    setReminderActive(newReminderStatus); // Update state
 
-  const handleToggleReminder = () => {
-    setReminderActive((prev) => !prev);
+    const updates = {
+      reminder: newReminderStatus, // Use the new status here
+    };
+
+    try {
+      await dispatch(updateTask({ id: task._id, updates }));
+      await dispatch(fetchTasks());
+    } catch (error) {
+      console.error("Failed to update task:", error);
+    }
   };
 
   const isDueSoon = () => {
     const now = new Date();
     const dueDate = new Date(task.dueDate);
-    return reminderActive && dueDate - now < 24 * 60 * 60 * 1000; // Check if due in less than 24 hours
+    return reminderActive && dueDate - now < 24 * 60 * 60 * 1000;
   };
+  const formattedDueDate = new Date(task.dueDate).toLocaleDateString();
 
   useEffect(() => {
     return () => {
@@ -104,7 +115,6 @@ const TaskItem = ({ task }) => {
           <div className="tgBTN">
             <h2 className="task-name">{task.name}</h2>
             <div className="reminder-toggle">
-              {/* <span>{reminderActive ? "Reminder On" : "Reminder Off"}</span> */}
               <button onClick={handleToggleReminder} className="toggle-button">
                 {reminderActive ? (
                   <FaToggleOn size={24} color="green" />
@@ -115,9 +125,7 @@ const TaskItem = ({ task }) => {
             </div>
           </div>
           <p className="task-description">{task.description}</p>
-          <p className="task-due-date">
-            Due: {new Date(task.dueDate).toLocaleDateString()}
-          </p>
+          <p className="task-due-date">Due: {formattedDueDate}</p>
           <p>
             Priority:{" "}
             <span

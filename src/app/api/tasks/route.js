@@ -1,6 +1,6 @@
-import DBConnect from "@/lib/DBConnect";
-import Task from "@/models/Taks";
 import { NextResponse } from "next/server";
+import DBConnect from "../../../lib/DBConnect";
+import Task from "../../../models/Taks";
 
 export async function POST(req) {
   await DBConnect();
