@@ -24,11 +24,12 @@ const TaskItem = ({ task }) => {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (id) => {
+    console.log(id);
     setIsDeleted(true);
 
     const timeout = setTimeout(async () => {
-      await dispatch(deleteTask({ id: task._id }));
+      await dispatch(deleteTask(id));
       await dispatch(fetchTasks());
       setIsDeleted(false);
     }, 5000);
@@ -120,7 +121,7 @@ const TaskItem = ({ task }) => {
             <button
               className={task.completed ? "not-allowed delete" : "delete"}
               disabled={task.completed}
-              onClick={handleDelete}
+              onClick={() => handleDelete(task._id)}
             >
               Delete
             </button>

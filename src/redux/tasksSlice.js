@@ -33,10 +33,7 @@ export const updateTask = createAsyncThunk(
   "tasks/updateTask",
   async ({ id, updates }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`/api/update-tasks`, {
-        id,
-        updates,
-      });
+      const response = await axios.put(`/api/tasks/${id}`, updates);
       toast.success("Task updated successfully!");
       return response.data;
     } catch (error) {
@@ -48,9 +45,9 @@ export const updateTask = createAsyncThunk(
 
 export const deleteTask = createAsyncThunk(
   "tasks/deleteTask",
-  async ({ id }, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`/api/delete-tasks`, { id });
+      await axios.delete(`/api/tasks/${id}`);
       toast.success("Task deleted successfully!");
       return id;
     } catch (error) {
@@ -97,12 +94,11 @@ const tasksSlice = createSlice({
         const id = action.payload;
         const taskToDelete = state.tasks.find((task) => task._id === id);
         if (taskToDelete) {
-          state.deletedTasks.push(taskToDelete); // Add to deletedTasks for undo
+          state.deletedTasks.push(taskToDelete);
           state.tasks = state.tasks.filter((task) => task._id !== id);
         }
       });
   },
 });
 
-export const { restoreDeletedTask } = tasksSlice.actions;
 export default tasksSlice.reducer;
