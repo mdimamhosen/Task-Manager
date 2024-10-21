@@ -34,10 +34,10 @@ const TaskForm = () => {
 
     const currentDate = new Date();
     const selectedDate = new Date(task.dueDate);
-    // if (selectedDate <= currentDate) {
-    //   toast.error("Due date should be in the future.");
-    //   return;
-    // }
+    if (selectedDate <= currentDate) {
+      toast.error("Due date should be in the future.");
+      return;
+    }
     if (task.tags.length === 0) {
       toast.error("Tags are required.");
       return;
