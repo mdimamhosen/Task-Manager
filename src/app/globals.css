@@ -212,3 +212,24 @@ body {
   padding: 5px;
   cursor: pointer;
 }
+.tgBTN {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.reminder-toggle {
+  display: flex;
+
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.due-soon {
+  border: 1px red solid;
+}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { updateTask, fetchTasks, deleteTask } from "../redux/tasksSlice";
 import Modal from "./Modal";
+import { FaToggleOn, FaToggleOff } from "react-icons/fa"; // Import toggle icons
 import "./TaskItem.css";
 
 const TaskItem = ({ task }) => {
@@ -10,6 +11,9 @@ const TaskItem = ({ task }) => {
   const [taskDetails, setTaskDetails] = useState(task);
   const [isDeleted, setIsDeleted] = useState(false);
   const [undoTimeout, setUndoTimeout] = useState(null);
+  const [reminderActive, setReminderActive] = useState(
+    task.reminderActive || false
+  );
 
   const getPriorityClass = (priority) => {
     switch (priority) {
@@ -25,9 +29,7 @@ const TaskItem = ({ task }) => {
   };
 
   const handleDelete = async (id) => {
-    console.log(id);
     setIsDeleted(true);
-
     const timeout = setTimeout(async () => {
       await dispatch(deleteTask(id));
       await dispatch(fetchTasks());
@@ -57,6 +59,7 @@ const TaskItem = ({ task }) => {
       dueDate: editedTask.dueDate,
       priority: editedTask.priority,
       tags: editedTask.tags,
+      reminderActive: reminderActive, // Include reminder state in updates
     };
     try {
       await dispatch(updateTask({ id: task._id, updates: update }));
@@ -72,6 +75,16 @@ const TaskItem = ({ task }) => {
     setConfirmationModal(true);
   };
 
+  const handleToggleReminder = () => {
+    setReminderActive((prev) => !prev);
+  };
+
+  const isDueSoon = () => {
+    const now = new Date();
+    const dueDate = new Date(task.dueDate);
+    return reminderActive && dueDate - now < 24 * 60 * 60 * 1000; // Check if due in less than 24 hours
+  };
+
   useEffect(() => {
     return () => {
       if (undoTimeout) {
@@ -83,8 +96,24 @@ const TaskItem = ({ task }) => {
   return (
     <>
       {!isDeleted ? (
-        <div className={`task-item ${task.completed ? "completed" : ""}`}>
-          <h2 className="task-name">{task.name}</h2>
+        <div
+          className={`task-item ${task.completed ? "completed" : ""} ${
+            isDueSoon() ? "due-soon" : ""
+          }`}
+        >
+          <div className="tgBTN">
+            <h2 className="task-name">{task.name}</h2>
+            <div className="reminder-toggle">
+              {/* <span>{reminderActive ? "Reminder On" : "Reminder Off"}</span> */}
+              <button onClick={handleToggleReminder} className="toggle-button">
+                {reminderActive ? (
+                  <FaToggleOn size={24} color="green" />
+                ) : (
+                  <FaToggleOff size={24} color="red" />
+                )}
+              </button>
+            </div>
+          </div>
           <p className="task-description">{task.description}</p>
           <p className="task-due-date">
             Due: {new Date(task.dueDate).toLocaleDateString()}
