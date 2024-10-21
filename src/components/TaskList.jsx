@@ -25,6 +25,10 @@ const TaskList = () => {
       <section>
         {status === "loading" && <p className="loading">Loading tasks...</p>}
         {status === "failed" && <p>{error}</p>}
+        {
+          // Add a message if there are no tasks
+          tasks.length === 0 && <p className="noTask">No tasks to display</p>
+        }
         <div className="task-list-container">
           {pendingTasks.map((task) => (
             <TaskItem key={`pending-${task._id}`} task={task} />
