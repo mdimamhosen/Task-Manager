@@ -44,7 +44,7 @@ The source code is available at: [GitHub Repository](https://github.com/mdimamho
    npm start
    ```
 
-6. **Open your browser and go to** `http://localhost:5000` to access the application.
+6. **Open your browser and go to** `http://localhost:3000` to access the application.
 
 ## API Endpoints
 
