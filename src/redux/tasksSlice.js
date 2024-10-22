@@ -37,8 +37,8 @@ export const createTask = createAsyncThunk(
     try {
       const response = await axios.post("/api/tasks", task);
       toast.success("Task created successfully!");
-      dispatch(fetchTasks()); // Re-fetch tasks
-      dispatch(fetchTags()); // Re-fetch tags
+      dispatch(fetchTasks());
+      dispatch(fetchTags());
       return response.data;
     } catch (error) {
       toast.error("Failed to create task.");
@@ -54,8 +54,8 @@ export const updateTask = createAsyncThunk(
     try {
       const response = await axios.put(`/api/tasks/${id}`, updates);
       toast.success("Task updated successfully!");
-      dispatch(fetchTasks()); // Re-fetch tasks
-      dispatch(fetchTags()); // Re-fetch tags
+      dispatch(fetchTasks());
+      dispatch(fetchTags());
       return response.data;
     } catch (error) {
       toast.error("Failed to update task.");
@@ -71,8 +71,8 @@ export const deleteTask = createAsyncThunk(
     try {
       await axios.delete(`/api/tasks/${id}`);
       toast.success("Task deleted successfully!");
-      dispatch(fetchTasks()); // Re-fetch tasks
-      dispatch(fetchTags()); // Re-fetch tags
+      dispatch(fetchTasks());
+      dispatch(fetchTags());
       return id;
     } catch (error) {
       toast.error("Failed to delete task.");
