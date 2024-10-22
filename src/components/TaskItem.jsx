@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { updateTask, fetchTasks, deleteTask } from "../redux/tasksSlice";
 import Modal from "./Modal";
-import { FaToggleOn, FaToggleOff } from "react-icons/fa"; // Import toggle icons
+import { FaToggleOn, FaToggleOff } from "react-icons/fa";
 import "./TaskItem.css";
 
 const TaskItem = ({ task }) => {
