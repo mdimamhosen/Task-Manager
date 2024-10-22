@@ -1,11 +1,27 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const TaskFilters = ({ filters, setFilters, tags }) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check screen size on load and on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <div
       className="filter-container"
+      // Change flex direction based on screen size
       style={{
         display: "flex",
+        flexDirection: isMobile ? "column" : "row",
         justifyContent: "space-between",
         width: "100%",
         gap: "1rem",
@@ -13,7 +29,7 @@ const TaskFilters = ({ filters, setFilters, tags }) => {
       }}
     >
       {/* Status Filter */}
-      <div className="form-group" style={{ width: "100%" }}>
+      <div className="form-group" style={{ width: isMobile ? "100%" : "100%" }}>
         <label className="label-style">Status:</label>
         <select
           value={filters.status}
@@ -29,7 +45,7 @@ const TaskFilters = ({ filters, setFilters, tags }) => {
       </div>
 
       {/* Priority Filter */}
-      <div className="form-group" style={{ width: "100%" }}>
+      <div className="form-group" style={{ width: isMobile ? "100%" : "100%" }}>
         <label className="label-style">Priority:</label>
         <select
           className="form-style"
@@ -46,7 +62,7 @@ const TaskFilters = ({ filters, setFilters, tags }) => {
       </div>
 
       {/* Tags Filter */}
-      <div className="form-group" style={{ width: "100%" }}>
+      <div className="form-group" style={{ width: isMobile ? "100%" : "100%" }}>
         <label className="label-style">Tags:</label>
         <select
           className="form-style"
@@ -54,7 +70,7 @@ const TaskFilters = ({ filters, setFilters, tags }) => {
           onChange={(e) =>
             setFilters((prev) => ({
               ...prev,
-              tags: e.target.value, // Keep as a string
+              tags: e.target.value,
             }))
           }
         >
@@ -68,7 +84,7 @@ const TaskFilters = ({ filters, setFilters, tags }) => {
       </div>
 
       {/* Search Filter */}
-      <div className="form-group" style={{ width: "100%" }}>
+      <div className="form-group" style={{ width: isMobile ? "100%" : "100%" }}>
         <label className="label-style">Search:</label>
         <input
           className="form-style"
