@@ -15,7 +15,6 @@ export async function GET(req) {
 
     const query = {};
 
-    // Search filter
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: "i" } },
@@ -24,20 +23,17 @@ export async function GET(req) {
     }
     console.log("query 1", query);
 
-    // Status filter
     if (status) {
-      query.completed = status === "completed"; // Directly assign boolean value based on status
+      query.completed = status === "completed";
     }
     console.log("query 2", query);
 
-    // Priority filter
     if (priority) {
       query.priority = priority;
     }
 
-    // Tags filter
     if (tags) {
-      query.tags = { $in: tags.split(",") }; // Ensure tags are an array
+      query.tags = { $in: tags.split(",") };
     }
 
     const tasks = await Task.find(query);
