@@ -59,7 +59,12 @@ const TaskList = () => {
   }, {});
 
   return (
-    <div>
+    <div
+      style={{
+        maxWidth: "600px",
+        margin: "0 auto",
+      }}
+    >
       <div
         style={{
           marginTop: "1rem",
@@ -89,6 +94,7 @@ const TaskList = () => {
         {/* Loop through each tag group */}
         <div
           style={{
+            // margin: " 0 20px",
             padding: "1rem",
           }}
         >
