@@ -123,9 +123,14 @@ export async function DELETE(req, { params }) {
   }
 }
 
-// The PUT function updates a task based on the provided task ID and updates received in the request body.
-// It validates the ID and ensures that required fields are present before attempting to update the task in the database.
-// If the update is successful, it returns the updated task; otherwise, it handles errors gracefully.
-// The DELETE function removes a task from the database using the provided task ID.
-// It checks if the task exists and returns an appropriate message if successful or if the task is not found,
-// handling any errors that may occur during the deletion process.
+{
+  /*
+
+  The PUT function updates a task based on the provided task ID and updates received in the request body.
+  It validates the ID and ensures that required fields are present before attempting to update the task in the database.
+  If the update is successful, it returns the updated task; otherwise, it handles errors gracefully.
+  The DELETE function removes a task from the database using the provided task ID.
+  It checks if the task exists and returns an appropriate message if successful or if the task is not found,
+ handling any errors that may occur during the deletion process.
+*/
+}

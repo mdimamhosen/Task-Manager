@@ -100,9 +100,10 @@ export async function DELETE(req) {
     );
   }
 }
-
-// The POST function handles the creation of a new task.
-// It retrieves task data from the request body, creates a new task in the database, and returns the created task in a success response.
-// The GET function fetches all tasks from the database and returns them in a success response, or an error message if the fetch fails.
-// The DELETE function deletes a task specified by its ID, obtained from the request body.
-// It checks if the task exists before attempting to delete it and returns appropriate success or error messages based on the operation's outcome.
+{
+  // The POST function handles the creation of a new task.
+  // It retrieves task data from the request body, creates a new task in the database, and returns the created task in a success response.
+  // The GET function fetches all tasks from the database and returns them in a success response, or an error message if the fetch fails.
+  // The DELETE function deletes a task specified by its ID, obtained from the request body.
+  // It checks if the task exists before attempting to delete it and returns appropriate success or error messages based on the operation's outcome.
+}

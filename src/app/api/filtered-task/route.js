@@ -44,9 +44,8 @@ export async function GET(req) {
       { status: 500 }
     );
   }
+  // The logic above constructs a MongoDB query based on optional query parameters: search, status, priority, and tags.
+  // It uses regex for case-insensitive matching in search, filters based on task completion status,
+  // sets priority if specified, and checks for tags using the $in operator. Finally, it fetches the matching tasks
+  // and returns them as a JSON response, handling any errors gracefully.
 }
-
-// The logic above constructs a MongoDB query based on optional query parameters: search, status, priority, and tags.
-// It uses regex for case-insensitive matching in search, filters based on task completion status,
-// sets priority if specified, and checks for tags using the $in operator. Finally, it fetches the matching tasks
-// and returns them as a JSON response, handling any errors gracefully.
