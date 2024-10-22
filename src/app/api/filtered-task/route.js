@@ -5,7 +5,7 @@ import Task from "../../../models/Taks";
 export async function GET(req) {
   await DBConnect();
   try {
-    // Get query parameters
+    // Getint query parameters
     const search = req.nextUrl.searchParams.get("search");
     const status = req.nextUrl.searchParams.get("status");
     const priority = req.nextUrl.searchParams.get("priority");
@@ -21,12 +21,11 @@ export async function GET(req) {
         { description: { $regex: search, $options: "i" } },
       ];
     }
-    console.log("query 1", query);
+    // If a search parameter is provided, add a regex condition to match task name or description
 
     if (status) {
       query.completed = status === "completed";
     }
-    console.log("query 2", query);
 
     if (priority) {
       query.priority = priority;
@@ -46,3 +45,8 @@ export async function GET(req) {
     );
   }
 }
+
+// The logic above constructs a MongoDB query based on optional query parameters: search, status, priority, and tags.
+// It uses regex for case-insensitive matching in search, filters based on task completion status,
+// sets priority if specified, and checks for tags using the $in operator. Finally, it fetches the matching tasks
+// and returns them as a JSON response, handling any errors gracefully.

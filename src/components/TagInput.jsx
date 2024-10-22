@@ -59,3 +59,5 @@ const TagInput = ({ name, setTask, task, placeholder }) => {
 };
 
 export default TagInput;
+
+// The TagInput component allows users to add and manage tags for a task by maintaining an array of chips in its state. It initializes the chips state with the task's existing tags and updates it whenever task.tags changes. Users can add tags by pressing "Enter" or "," after typing, provided the tag is not empty or already included. Each tag can be removed via a delete button, which updates the chips state accordingly. The component also ensures that the updated tags are reflected in the parent task state through the setTask function. The tags are displayed as chips above the input field, which remains available for new tag entries.

@@ -85,8 +85,8 @@ export async function PUT(req, { params }) {
 export async function DELETE(req, { params }) {
   await DBConnect();
   try {
-    const { id } = params; // Ensure `params` contains `id`
-    console.log({ id }); // This should log the correct id
+    const { id } = params;
+
     const deletedTask = await Task.findByIdAndDelete(id);
     if (!deletedTask) {
       return NextResponse.json(
@@ -122,3 +122,10 @@ export async function DELETE(req, { params }) {
     );
   }
 }
+
+// The PUT function updates a task based on the provided task ID and updates received in the request body.
+// It validates the ID and ensures that required fields are present before attempting to update the task in the database.
+// If the update is successful, it returns the updated task; otherwise, it handles errors gracefully.
+// The DELETE function removes a task from the database using the provided task ID.
+// It checks if the task exists and returns an appropriate message if successful or if the task is not found,
+// handling any errors that may occur during the deletion process.

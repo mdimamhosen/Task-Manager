@@ -85,10 +85,9 @@ export const fetchTasksWithFilterValues = createAsyncThunk(
   "tasks/fetchTasksWithFilterValues",
   async (filters, { rejectWithValue }) => {
     try {
-      console.log("Filters from api calling:", filters); // Log the received filters
+      console.log("Filters from api calling:", filters);
       const queryObject = {};
 
-      // Check and set filters
       if (filters.status && filters.status !== "all") {
         queryObject.status = filters.status;
       } else {
@@ -101,9 +100,8 @@ export const fetchTasksWithFilterValues = createAsyncThunk(
         console.log("Priority filter is not set.");
       }
 
-      // Directly use tags as a string
       if (filters.tags) {
-        queryObject.tags = filters.tags; // No need to join
+        queryObject.tags = filters.tags;
       } else {
         console.log("Tags filter is not set or is empty.");
       }
@@ -114,18 +112,13 @@ export const fetchTasksWithFilterValues = createAsyncThunk(
         console.log("Search filter is not set.");
       }
 
-      // Log the constructed query object
-      console.log("Constructed query object:", queryObject);
       const query = new URLSearchParams(queryObject).toString();
-
-      // Log the final query string
-      console.log("Final query string:", query);
 
       const response = await axios.get(`/api/filtered-task?${query}`);
       return response.data.data;
     } catch (error) {
       toast.error("Failed to fetch tasks with filters.");
-      console.error("Error fetching tasks:", error); // Log the error for debugging
+      console.error("Error fetching tasks:", error);
       return rejectWithValue(error.response?.data || error.message);
     }
   }

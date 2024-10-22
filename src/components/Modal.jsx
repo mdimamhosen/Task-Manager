@@ -121,3 +121,5 @@ const Modal = ({ isOpen, onClose, onSave, taskDetails }) => {
 };
 
 export default Modal;
+
+//  The Modal component manages the state of a task for editing, populating its fields based on the provided taskDetails prop. It uses the useEffect hook to update the task state when taskDetails changes, while handleChange updates individual fields on user input. The modal renders a form that includes inputs for task name, description, due date, priority, and tags. On form submission, it logs the task data and calls the onSave function to save changes. The modal is conditionally rendered based on the isOpen prop, and includes cancel and save buttons for user interaction.

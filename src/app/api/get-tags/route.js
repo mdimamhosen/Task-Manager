@@ -20,3 +20,7 @@ export async function GET(req) {
     );
   }
 }
+
+// It first unwinds the tags array to create individual documents for each tag, then groups them to eliminate duplicates.
+// The tags are sorted alphabetically, and the unique tags are returned in a JSON response.
+// Any errors encountered during the process are handled gracefully by returning an appropriate error message.
