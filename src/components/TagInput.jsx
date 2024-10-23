@@ -2,66 +2,53 @@ import React, { useEffect, useState } from "react";
 import { MdClose } from "react-icons/md";
 import "./TagInput.css";
 
-const TagInput = ({ name, setTask, task, placeholder }) => {
-  const [chips, setChips] = useState(task.tags || []);
+const TagInput = ({ name, setTask, task }) => {
+  const [selectedTag, setSelectedTag] = useState(task.tags ? task.tags[0] : "");
+  const availableTags = ["Work", "Personal", "Urgent", "Home", "Shopping"];
 
   useEffect(() => {
-    setChips(task.tags || []);
+    setSelectedTag(task.tags ? task.tags[0] : "");
   }, [task.tags]);
 
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter" || event.key === ",") {
-      event.preventDefault();
-      const chipValue = event.target.value.trim();
-      if (chipValue && !chips.includes(chipValue)) {
-        setChips((prevChips) => [...prevChips, chipValue]);
-        event.target.value = "";
-      }
+  const handleAddTag = (event) => {
+    const tagValue = event.target.value;
+    if (tagValue) {
+      setSelectedTag(tagValue);
     }
   };
 
-  const handleDeleteChip = (chipIndex) => {
-    setChips((prevChips) =>
-      prevChips.filter((_, index) => index !== chipIndex)
-    );
-  };
-
   useEffect(() => {
-    setTask((prev) => ({ ...prev, tags: chips }));
-  }, [chips, setTask]);
+    setTask((prev) => ({ ...prev, tags: selectedTag ? [selectedTag] : [] }));
+  }, [selectedTag, setTask]);
 
   return (
     <div className="tag-input">
       <div className="chips-container">
-        {chips.map((chip, index) => (
-          <div key={index} className="chip">
-            {chip}
+        {selectedTag && (
+          <div className="chip">
+            {selectedTag}
             <button
               type="button"
               className="delete-chip"
-              onClick={() => handleDeleteChip(index)}
+              onClick={() => setSelectedTag("")}
             >
               <MdClose className="icon" />
             </button>
           </div>
-        ))}
-        <input
-          id={name}
-          name={name}
-          type="text"
-          placeholder={placeholder}
-          onKeyDown={handleKeyDown}
-          className="form-style"
-        />
+        )}
+        <select onChange={handleAddTag} className="form-style" defaultValue="">
+          <option value="" disabled>
+            Select a tag
+          </option>
+          {availableTags.map((tag, index) => (
+            <option key={index} value={tag}>
+              {tag}
+            </option>
+          ))}
+        </select>
       </div>
     </div>
   );
 };
 
-{
-  /*
-
- The TagInput component allows users to add and manage tags for a task by maintaining an array of chips in its state. It initializes the chips state with the task's existing tags and updates it whenever task.tags changes. Users can add tags by pressing "Enter" or "," after typing, provided the tag is not empty or already included. Each tag can be removed via a delete button, which updates the chips state accordingly. The component also ensures that the updated tags are reflected in the parent task state through the setTask function. The tags are displayed as chips above the input field, which remains available for new tag entries.
- */
-}
 export default TagInput;
